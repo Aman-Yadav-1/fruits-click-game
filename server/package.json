@@ -4,7 +4,7 @@
   "description": "Backend server for Fruits Click Game Dashboard",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node render.js",
     "dev": "nodemon server.js",
     "init-db": "node scripts/init-admin.js",
     "test": "echo \"Error: no test specified\" && exit 1"
