@@ -49,7 +49,14 @@ app.use('/api/users', userRoutes);
 
 // Root route
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Fruits Click Game API' });
+  res.json({ 
+    message: 'Fruits Click Game API Server', 
+    status: 'online',
+    endpoints: {
+      auth: '/api/auth',
+      users: '/api/users'
+    }
+  });
 });
 
 // Connect to MongoDB
