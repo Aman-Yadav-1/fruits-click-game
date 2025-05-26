@@ -1,0 +1,17 @@
+/* Fix for ReactToastify passive event listener issue */
+.Toastify__toast-container {
+  touch-action: none;
+}
+
+.Toastify__toast {
+  cursor: pointer;
+  touch-action: none;
+}
+
+.Toastify__toast-body {
+  touch-action: none;
+}
+
+.Toastify__close-button {
+  touch-action: none;
+}

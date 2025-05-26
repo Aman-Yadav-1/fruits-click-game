@@ -1,0 +1,29 @@
+{
+  "name": "fruits-click-game",
+  "version": "1.0.0",
+  "description": "A real-time dashboard application for a fruits click game",
+  "main": "index.js",
+  "scripts": {
+    "start": "node start-app.js",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "init-db": "cd server && npm run init-db",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "nodejs",
+    "express",
+    "mongodb",
+    "socket.io",
+    "real-time",
+    "game"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "path": "^0.12.7"
+  }
+}
