@@ -189,8 +189,14 @@ export const AuthProvider = ({ children }) => {
       try {
         // Try to connect to the real server first
         console.log('Attempting to connect to server...');
-        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
-        const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+        // Use the direct URL to ensure we're connecting to the right endpoint
+        const API_URL = 'https://fruits-click-game.onrender.com/api';
+        console.log('Using API URL:', API_URL);
+        const response = await axios.post(`${API_URL}/auth/login`, { email, password }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
         console.log('Server response:', response.data);
         
         const { token, user } = response.data;

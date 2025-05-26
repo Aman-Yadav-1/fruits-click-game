@@ -1,20 +1,24 @@
 import axios from 'axios';
 
-// Set base URL for API requests
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Set base URL for API requests - hardcode for production to ensure it works
+const API_URL = 'https://fruits-click-game.onrender.com/api';
+console.log('API URL configured as:', API_URL);
 
 // Create axios instance with the base URL
 const axiosInstance = axios.create({
   baseURL: API_URL,
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
   }
 });
 
 // Set default axios instance
 axios.defaults.baseURL = API_URL;
 axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Content-Type'] = 'application/json';
+axios.defaults.headers.common['Accept'] = 'application/json';
 
 // Mock data for admin mode
 let mockUsers = [
