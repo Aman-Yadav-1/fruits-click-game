@@ -25,7 +25,7 @@ const Navbar = () => {
     <BootstrapNavbar variant="dark" expand="lg" className="navbar">
       <Container>
         <BootstrapNavbar.Brand as={Link} to="/">
-          <GiBanana className="me-2" style={{ fontSize: '1.5rem' }} /> Banana Clicker
+          <GiBanana className="me-2" style={{ fontSize: '1.5rem' }} /> Fruit Click Game
         </BootstrapNavbar.Brand>
         
         <BootstrapNavbar.Toggle aria-controls="navbar-nav" />
