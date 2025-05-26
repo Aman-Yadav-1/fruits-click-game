@@ -129,18 +129,16 @@ export const AuthProvider = ({ children }) => {
   // Login user
   const login = async (credentials) => {
     try {
-      // Extract email and password from credentials object
+      setLoading(true);
       const email = credentials.email;
       const password = credentials.password;
       
       // Special handling for admin login
       if (email === 'admin@example.com' && password === 'admin123') {
-        // Create admin token
+        // Create admin token and user
         const adminToken = `admin-token-${Date.now()}`;
-        
-        // Set admin user data
         const adminUser = {
-          _id: 'admin-user',
+          _id: 'admin-id',
           username: 'Admin',
           email: 'admin@example.com',
           role: 'admin',
@@ -158,12 +156,14 @@ export const AuthProvider = ({ children }) => {
         setUser(adminUser);
         setIsAuthenticated(true);
         
+        toast.success('Admin login successful!');
         return { success: true };
       }
       
       try {
-        // Regular user login - try real API first
-        const response = await axios.post('/api/auth/login', { email, password });
+        // Regular user login - try real API first with proper URL
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+        const response = await axios.post(`${API_URL}/auth/login`, { email, password });
         const { token, user } = response.data;
         
         // Store token and user data
@@ -174,7 +174,7 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         
         // Add this user to the logged-in users list for admin dashboard
-        const emailUsername = typeof email === 'string' ? email.split('@')[0] : 'player';
+        const emailUsername = email.includes('@') ? email.split('@')[0] : 'player';
         addUserToLocalStorage({
           _id: user._id || `user-${Date.now()}`,
           username: user.username || emailUsername,
@@ -188,8 +188,9 @@ export const AuthProvider = ({ children }) => {
         toast.success('Login successful!');
         return { success: true };
       } catch (apiError) {
+        console.log('Login API error:', apiError);
         // If API fails, create a mock user for demo purposes
-        const emailUsername = typeof email === 'string' ? email.split('@')[0] : 'player';
+        const emailUsername = email.includes('@') ? email.split('@')[0] : 'player';
         const mockUser = {
           _id: `user-${Date.now()}`,
           username: emailUsername,
@@ -201,21 +202,21 @@ export const AuthProvider = ({ children }) => {
         };
         
         // Create a mock token
-        const mockToken = `player-token-${Date.now()}`;
+        const mockToken = `mock-token-${Date.now()}`;
         
-        // Store token and user data
+        // Store mock data
         localStorage.setItem('token', mockToken);
         localStorage.setItem('user', JSON.stringify(mockUser));
-        
-        // Add this user to the logged-in users list for admin dashboard
-        addUserToLocalStorage(mockUser);
         
         // Update state
         setToken(mockToken);
         setUser(mockUser);
         setIsAuthenticated(true);
         
-        toast.success('Login successful!');
+        // Add to local storage for admin dashboard
+        addUserToLocalStorage(mockUser);
+        
+        toast.info('Connected in demo mode. MongoDB connection not available.');
         return { success: true };
       }
     } catch (error) {

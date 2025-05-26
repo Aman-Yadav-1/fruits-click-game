@@ -3,6 +3,9 @@ import axios from 'axios';
 // Set base URL for API requests
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
+// Create axios instance with the base URL
+axios.defaults.baseURL = API_URL;
+
 // Mock data for admin mode
 let mockUsers = [
   {
