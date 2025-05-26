@@ -63,25 +63,51 @@ export const AuthProvider = ({ children }) => {
           }
           
           // For simplicity, we'll decode the token here (not secure for production)
-          const base64Url = token.split('.')[1];
-          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-          const jsonPayload = decodeURIComponent(
-            atob(base64).split('').map(c => {
-              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join('')
-          );
-          
-          const decoded = JSON.parse(jsonPayload);
-          
-          // Set the user data from the decoded token
-          setUser({
-            id: decoded.id,
-            role: decoded.role,
-            username: decoded.username || 'User',
-            email: decoded.email || '',
-            bananaCount: 0,
-            isBlocked: false
-          });
+          try {
+            // Handle special tokens (admin and mock tokens)
+            if (token.startsWith('admin-token-') || token.startsWith('mock-token-')) {
+              // For special tokens, use the stored user data
+              const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+              setUser(storedUser);
+              setIsAuthenticated(true);
+              return;
+            }
+            
+            // For JWT tokens, decode them properly
+            const parts = token.split('.');
+            if (parts.length !== 3) {
+              throw new Error('Invalid token format');
+            }
+            
+            const base64Url = parts[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(
+              atob(base64).split('').map(c => {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+              }).join('')
+            );
+            
+            const decoded = JSON.parse(jsonPayload);
+            
+            // Set the user data from the decoded token
+            setUser({
+              id: decoded.id,
+              role: decoded.role,
+              username: decoded.username || 'User',
+              email: decoded.email || '',
+              bananaCount: 0,
+              isBlocked: false
+            });
+            
+            setIsAuthenticated(true);
+          } catch (decodeError) {
+            console.error('Token decode error:', decodeError);
+            localStorage.removeItem('token');
+            setToken(null);
+            setIsAuthenticated(false);
+            setUser(null);
+            return;
+          }
           
           setIsAuthenticated(true);
         } catch (error) {
@@ -161,8 +187,12 @@ export const AuthProvider = ({ children }) => {
       }
       
       try {
-        // Regular user login - try real API first with proper URL
-        const response = await axios.post('/auth/login', { email, password });
+        // Try to connect to the real server first
+        console.log('Attempting to connect to server...');
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+        const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+        console.log('Server response:', response.data);
+        
         const { token, user } = response.data;
         
         // Store token and user data
@@ -173,22 +203,21 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         
         // Add this user to the logged-in users list for admin dashboard
-        const emailUsername = email.includes('@') ? email.split('@')[0] : 'player';
         addUserToLocalStorage({
-          _id: user._id || `user-${Date.now()}`,
-          username: user.username || emailUsername,
-          email: email,
-          role: 'player',
-          isBlocked: false,
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          isBlocked: user.isBlocked,
           isActive: true,
-          bananaCount: user.bananaCount || Math.floor(Math.random() * 50)
+          bananaCount: user.bananaCount
         });
         
         toast.success('Login successful!');
         return { success: true };
       } catch (apiError) {
         console.log('Login API error:', apiError);
-        // If API fails, create a mock user for demo purposes
+        // If API fails, fall back to demo mode
         const emailUsername = email.includes('@') ? email.split('@')[0] : 'player';
         const mockUser = {
           _id: `user-${Date.now()}`,
@@ -215,7 +244,7 @@ export const AuthProvider = ({ children }) => {
         // Add to local storage for admin dashboard
         addUserToLocalStorage(mockUser);
         
-        toast.info('Connected in demo mode. MongoDB connection not available.');
+        toast.info('Connected in demo mode. Server connection not available.');
         return { success: true };
       }
     } catch (error) {
