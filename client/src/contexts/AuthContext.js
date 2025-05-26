@@ -162,8 +162,7 @@ export const AuthProvider = ({ children }) => {
       
       try {
         // Regular user login - try real API first with proper URL
-        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-        const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+        const response = await axios.post('/auth/login', { email, password });
         const { token, user } = response.data;
         
         // Store token and user data
