@@ -2,9 +2,9 @@
   "name": "fruits-click-game-server",
   "version": "1.0.0",
   "description": "Backend server for Fruits Click Game Dashboard",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node render.js",
+    "start": "node app.js",
     "dev": "nodemon server.js",
     "init-db": "node scripts/init-admin.js",
     "test": "echo \"Error: no test specified\" && exit 1"

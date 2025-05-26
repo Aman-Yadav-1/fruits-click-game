@@ -493,4 +493,10 @@ app.delete('/api/users/:id', authenticateToken, async (req, res) => {
   }
 });
 
-module.exports = { app, server };
+// Start server
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Server URL: http://localhost:${PORT}`);
+  console.log('MongoDB connection active');
+});
